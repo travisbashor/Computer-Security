@@ -1,0 +1,6 @@
+CS: the science that deals with the theory and methods of processing information in
+digital computers, the design of computer hardware and software, and the
+applications of computers.
+IT: the development, implementation, and maintenance of
+computer hardware and software systems to organize and communicate information
+electronically. Abbreviation: IT
