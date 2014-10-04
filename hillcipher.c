@@ -15,22 +15,17 @@ Matrix* assignMatrixFromFile(char*);
 char* collectABC(char*);
 void printMessage(char*);
 void padMessage(char**, Matrix*);
-Matrix* sum(Matrix*, Matrix*);
 Matrix* hillProduct(Matrix*, Matrix*);
-int dotProduct(Matrix*, Matrix*);
+int dotProduct(int**, int**, int, int);
+Matrix* createColumn(char*, int);
+char* encipherText(char*, Matrix*);
 
 int main(int argc, char *argv[]) {
-  int i, sideLength;
   Matrix* myMatrix;
   char *input = NULL;
   char *output = NULL;
 
   if(argc == 3) {
-    // list files used as arguments
-    for(i = 1; i < argc; ++i) {
-      printf("File %d: %s\n", i, argv[i]);
-    }
-
     // generate matrix from file
     myMatrix = assignMatrixFromFile(argv[1]);
 
@@ -41,8 +36,12 @@ int main(int argc, char *argv[]) {
     input = collectABC(argv[2]);
     padMessage(&input, myMatrix);
 
+    // encipher the text
+    output = encipherText(input, myMatrix);
+
     // echo message to screen
-    printMessage(input);   
+    printMessage(input);
+    printMessage(output);   
 
   }
   else {
@@ -76,13 +75,12 @@ Matrix* allocMatrix() {
 
 // print a matrix of given dimensions
 void printMatrix(Matrix* someMatrix) {
-  // TODO: check for formatting specifications
   int i, j;
   printf("\n");
   // row by row, print the matrix
   for(i = 0; i < someMatrix->rows; ++i) {
     for(j = 0; j < someMatrix->cols; ++j) {
-      printf("%d ", someMatrix->keyMatrix[i][j]);
+      printf("%d ", someMatrix->grid[i][j]);
     }
     printf("\n");
   }
@@ -162,7 +160,7 @@ void padMessage(char** text, Matrix* someMatrix) {
   }
 }
 
-// print message
+// print text
 void printMessage(char* text) {
   int i;
   printf("\n");
@@ -176,8 +174,38 @@ void printMessage(char* text) {
   printf("\n");
 }
 
-char* encipherText(char* text, Matrix* someMatrix) {
+// encipher the plaintext, fragment by fragment
+char* encipherText(char* text, Matrix* keyMatrix) {
+  int i, j; 
+  Matrix* tempMatrix = NULL;
+  Matrix* cipherColumn = NULL;
+  char *output = calloc(10000, sizeof(char));
 
+  for(i = 0; i < 10000; i += keyMatrix->rows) {
+    if(text[i] != 0) {
+      tempMatrix = createColumn(&text[i], keyMatrix->rows);
+      for(j = 0; j < keyMatrix->rows; ++j) {
+        output[i + j] = (hillProduct(keyMatrix, tempMatrix)->grid)[j][0];
+      }
+    }
+  }
+
+  return output;
+}
+
+// create a column of fragmented text from the plaintext for multiplication against the key
+Matrix* createColumn(char* text, int rowNum) {
+  int i;
+  Matrix* newColumn = allocMatrix();
+  newColumn->cols = 1;
+  newColumn->rows = rowNum;
+  newColumn->grid = alloc2DArray(newColumn->rows, newColumn->cols);
+
+  for(i = 0; i < rowNum; ++i) {
+    (newColumn->grid)[i][0] = text[i];
+  }
+
+  return newColumn;
 }
 
 // auxillary function for encipherText(), which performs matrix multiplication
@@ -189,8 +217,8 @@ Matrix* hillProduct(Matrix* keyMatrix, Matrix* columnVector) {
   C->grid = alloc2DArray(C->rows, C->cols);
 
   for(i = 0; i < C->rows; ++i) {
-    // make some temporary matrices
-    (C->grid)[i][0] = (dotProduct(keyMatrix->grid, columnVector->grid, i, columnVector->rows)) % 26)
+    (C->grid)[i][0] = 
+      (dotProduct(keyMatrix->grid, columnVector->grid, i, columnVector->rows) % 26 + 'a');
   }
 
   return C;
@@ -202,24 +230,8 @@ int dotProduct(int** rowVector, int** columnVector, int rowSelector, int numTerm
   int aDotB = 0;
   
   for(i = 0; i < numTerms; ++i) {
-    aDotB += (rowVector[rowSelector][i] * (columnVector->grid)[i][0]);
+    aDotB += ((rowVector[rowSelector][i]) * (columnVector[i][0] - 'a') );
   }
 
   return aDotB;
 } 
-
-Matrix* sum(Matrix* A, Matrix* B) {
-  int i, j;
-  Matrix* C = allocMatrix();
-  C->rows = A->rows;
-  C->cols = A->cols;
-  C->grid = alloc2DArray(C->rows, C->cols);
-
-  for(i = 0; i < C->rows; ++i) {
-    for(j = 0; j < C->cols; ++j) {
-      (C->grid)[i][j] = (A->grid)[i][j] + (B->grid)[i][j];
-    }
-  }
-
-  return C;
-}
