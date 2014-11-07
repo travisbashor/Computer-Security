@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 // prototypes
+char* hexCharToBin(char);
 char* padBinaryString(char*);
 void printBinaryString(char*);
 char* binToHex(char*);
@@ -17,15 +18,12 @@ char* calcCRC(char*, char*);
 bool verifyCRC(char*, char*);
 
 int main(int argc, char** argv) {
-  char* someBinary = argv[1];
-  char* paddedBinary = padBinaryString(someBinary);
+  char* someHex = argv[1];
 
-  // echo the binary to the console
-  printf("The binary string is:\n");
-  printBinaryString(paddedBinary);
-  printf("\nIts hexadecimal equivalent is: %s\n", binToHex(paddedBinary));
-
-  // strncpy(smallString, someBinary + 4, 4);
+  // echo the hex value to the console
+  printf("The hex value is: %s\n", someHex);
+  puts("Its binary equivalent is:");
+  printBinaryString(hexToBin(someHex));
   return 0;
 }
 
@@ -43,6 +41,20 @@ char* binToHex(char* binary) {
   }
 
   return hexadecimalValue;
+}
+
+// convert a string of hexadecimal digits into a binary string
+char* hexToBin(char* hex) {
+  int i, numDigits;
+  numDigits = strlen(hex);
+  char* binaryEquivalent = (char *)calloc(161, sizeof(char));
+
+  // digit-by-digit, convert hex characters into binary nibbles
+  for(i = 0; i < numDigits; ++i) {
+    strcat(binaryEquivalent, hexCharToBin(hex[i]));
+  }
+
+  return binaryEquivalent;
 }
 
 // formatted print for humans
@@ -131,3 +143,58 @@ char fourBitToHex(char* fourBits) {
   return hexChar;
 }
 
+// convert a hex character to its 4-bit binary equivalent
+char* hexCharToBin(char hexValue) {
+  char* nibble = calloc(5, sizeof(char));
+
+  if(hexValue == '0') {
+    nibble = "0000";
+  }
+  else if(hexValue == '1') {
+    nibble = "0001";
+  }
+  else if(hexValue == '2') {
+    nibble = "0010";
+  }
+  else if(hexValue == '3') {
+    nibble = "0011";
+  }
+  else if(hexValue == '4') {
+    nibble = "0100";
+  }
+  else if(hexValue == '5') {
+    nibble = "0101";
+  }
+  else if(hexValue == '6') {
+    nibble = "0110";
+  }
+  else if(hexValue == '7') {
+    nibble = "0111";
+  }
+  else if(hexValue == '8') {
+    nibble = "1000";
+  }
+  else if(hexValue == '9') {
+    nibble = "1001";
+  }
+  else if(hexValue == 'A') {
+    nibble = "1010";
+  }
+  else if(hexValue == 'B') {
+    nibble = "1011";
+  }
+  else if(hexValue == 'C') {
+    nibble = "1100";
+  }
+  else if(hexValue == 'D') {
+    nibble = "1101";
+  }
+  else if(hexValue == 'E') {
+    nibble = "1110";
+  }
+  else if(hexValue == 'F') {
+    nibble = "1111";
+  }
+
+  return nibble;
+}
