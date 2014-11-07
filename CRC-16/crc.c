@@ -19,50 +19,46 @@ char* assignHexFromFile(char*);
 
 int main(int argc, char** argv) {
   char* polynomial = "10100101010001101";
+  char* oneBinary = argv[1];
+  char* otherBinary = argv[2];
   char* flagValue;
   char* inputFile;
   char* someHex = (char *)calloc(41, sizeof(char));
+  
+  printf("The result of the XOR between the two values is: \n");
+  printBinaryString(xor(oneBinary, otherBinary));
+  // printf("The input file (bin):\n");
+  // printBinaryString(hexToBin(someHex));
+  // printf("\n");
 
-  if(argc == 3) {
-    if(strcmp(argv[1], "c") == 0 || strcmp(argv[1], "v") == 0) {
-      flagValue = argv[1];
-    }
-    else {
-      puts("Please choose either 'c' or 'v' for your flag value.");
-    }
+  // // state the polynomial used for the calculation
+  // printf("The polynomial that was used (binary bit string): 1010 0101 0100 0110 1\n");
+  // printf("We will append 16 zeroes at the end of the binary input.\n\n");
 
-    // gather hex value from input file
-    inputFile = argv[2];
-    char* someHex = assignHexFromFile(inputFile);
+  // // state the xors
+  // printf("The binary string difference after each XOR step of the CRC calculation:\n\n");
+  // printf("**Stuff goes here**\n\n");
 
-    // echo the hex value to the console, along with its binary equivalent
-    printf("The input file (hex):\n%s\n", someHex);
-    if(validate(inputFile)) {
-      printf("The file contains valid hexadecimal digits.\n");
-    }
-    else {
-      printf("That ain't no hexadecimal!");
-    }
-    // printf("The input file (bin):\n");
-    // printBinaryString(hexToBin(someHex));
-    // printf("\n");
-
-    // // state the polynomial used for the calculation
-    // printf("The polynomial that was used (binary bit string): 1010 0101 0100 0110 1\n");
-    // printf("We will append 16 zeroes at the end of the binary input.\n\n");
-
-    // // state the xors
-    // printf("The binary string difference after each XOR step of the CRC calculation:\n\n");
-    // printf("**Stuff goes here**\n\n");
-
-    // // compute the crc and display the results
-    // printf("The computed CRC for the input file is: SOMENUMBER\n");
-
-  }
-  else {
-    puts("You must enter a flag value ('c' or 'v') and an input file name.");
-  }
+  // // compute the crc and display the results
+  // printf("The computed CRC for the input file is: SOMENUMBER\n");
   return 0;
+}
+
+char* xor(char* binA, char* binB) {
+  int i;
+  char* binC = (char *)calloc(strlen(binA) + 1, sizeof(char));
+
+  // compare the digits of A and B to determine the result for C
+  for(i = 0; i < strlen(binA); ++i) {
+    if(binA[i] == binB[i]) {
+      binC[i] = '0';
+    }
+    else {
+      binC[i] = '1';
+    }
+  }
+
+  return binC;
 }
 
 bool validate(char* inputFile) {
@@ -90,6 +86,7 @@ bool validate(char* inputFile) {
 
   return goodFile;
 }
+
 // return the hexadecimal value in the file
 char* assignHexFromFile(char* fileName) {
   char* hex = calloc(41, sizeof(char));
