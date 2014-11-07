@@ -13,18 +13,91 @@ char fourBitToHex(char*);
 char* hexToBin(char*);
 bool validate(char*);
 char* xor(char*, char*);
-// maybe one that divides, too
 char* calcCRC(char*, char*);
 bool verifyCRC(char*, char*);
+char* assignHexFromFile(char*);
 
 int main(int argc, char** argv) {
-  char* someHex = argv[1];
+  char* polynomial = "10100101010001101";
+  char* flagValue;
+  char* inputFile;
+  char* someHex = (char *)calloc(41, sizeof(char));
 
-  // echo the hex value to the console
-  printf("The hex value is: %s\n", someHex);
-  puts("Its binary equivalent is:");
-  printBinaryString(hexToBin(someHex));
+  if(argc == 3) {
+    if(strcmp(argv[1], "c") == 0 || strcmp(argv[1], "v") == 0) {
+      flagValue = argv[1];
+    }
+    else {
+      puts("Please choose either 'c' or 'v' for your flag value.");
+    }
+
+    // gather hex value from input file
+    inputFile = argv[2];
+    char* someHex = assignHexFromFile(inputFile);
+
+    // echo the hex value to the console, along with its binary equivalent
+    printf("The input file (hex):\n%s\n", someHex);
+    if(validate(inputFile)) {
+      printf("The file contains valid hexadecimal digits.\n");
+    }
+    else {
+      printf("That ain't no hexadecimal!");
+    }
+    // printf("The input file (bin):\n");
+    // printBinaryString(hexToBin(someHex));
+    // printf("\n");
+
+    // // state the polynomial used for the calculation
+    // printf("The polynomial that was used (binary bit string): 1010 0101 0100 0110 1\n");
+    // printf("We will append 16 zeroes at the end of the binary input.\n\n");
+
+    // // state the xors
+    // printf("The binary string difference after each XOR step of the CRC calculation:\n\n");
+    // printf("**Stuff goes here**\n\n");
+
+    // // compute the crc and display the results
+    // printf("The computed CRC for the input file is: SOMENUMBER\n");
+
+  }
+  else {
+    puts("You must enter a flag value ('c' or 'v') and an input file name.");
+  }
   return 0;
+}
+
+bool validate(char* inputFile) {
+  int i;
+  char* fileContents = (char *)calloc(41, sizeof(char));
+  int fileLength;
+  FILE* ifp = fopen(inputFile, "r");
+  bool goodFile = true;
+
+  // gather contents of input file
+  fscanf(ifp, "%s", fileContents);
+  fileLength = strlen(fileContents);
+
+  for(i = 0; i < fileLength; ++i) {
+    if(fileContents[i] < '0' || fileContents[i] > 'f') {
+      goodFile = false;
+    }
+    else if(fileContents[i] > '9' && fileContents[i] < 'A') {
+      goodFile = false;
+    }
+    else if(fileContents[i] > 'F' && fileContents[i] < 'a') {
+      goodFile = false;
+    }
+  }
+
+  return goodFile;
+}
+// return the hexadecimal value in the file
+char* assignHexFromFile(char* fileName) {
+  char* hex = calloc(41, sizeof(char));
+  FILE* ifp = fopen(fileName, "r");
+
+  fscanf(ifp, "%s", hex);
+  fclose(ifp);
+  return hex;
 }
 
 // translate a binary string into hex
@@ -67,6 +140,7 @@ void printBinaryString(char* binaryString) {
     }
     printf("%c", binaryString[i]);
   }
+  printf("\n");
 } 
 
 // prepend zeroes to a binary string so that it has groups of 4 bits
@@ -177,22 +251,22 @@ char* hexCharToBin(char hexValue) {
   else if(hexValue == '9') {
     nibble = "1001";
   }
-  else if(hexValue == 'A') {
+  else if(hexValue == 'A' || hexValue == 'a') {
     nibble = "1010";
   }
-  else if(hexValue == 'B') {
+  else if(hexValue == 'B' || hexValue == 'b') {
     nibble = "1011";
   }
-  else if(hexValue == 'C') {
+  else if(hexValue == 'C' || hexValue == 'c') {
     nibble = "1100";
   }
-  else if(hexValue == 'D') {
+  else if(hexValue == 'D' || hexValue == 'd') {
     nibble = "1101";
   }
-  else if(hexValue == 'E') {
+  else if(hexValue == 'E' || hexValue == 'e') {
     nibble = "1110";
   }
-  else if(hexValue == 'F') {
+  else if(hexValue == 'F' || hexValue == 'f') {
     nibble = "1111";
   }
 
