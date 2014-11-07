@@ -5,6 +5,8 @@
 #include <stdlib.h>
 
 // prototypes
+char* padBinaryString(char*);
+void printBinaryString(char*);
 char* binToHex(char*);
 char fourBitToHex(char*);
 char* hexToBin(char*);
@@ -15,25 +17,63 @@ char* calcCRC(char*, char*);
 bool verifyCRC(char*, char*);
 
 int main(int argc, char** argv) {
-  char someBinary[9] = "11110001";
-  char otherString[15] = "0000";
-  // strcat(otherString, someBinary);
+  char* someBinary = argv[1];
+  char* paddedBinary = padBinaryString(someBinary);
 
-  printf("%s\n", otherString);
-  printf("%d", sizeof(otherString));
+  // echo the binary to the console
+  printf("The binary string is:\n");
+  printBinaryString(paddedBinary);
+  printf("\nIts hexadecimal equivalent is: %s\n", binToHex(paddedBinary));
+
   // strncpy(smallString, someBinary + 4, 4);
   return 0;
 }
 
-// char* binToHex(char* binary) {
-//   int numNibbles = (sizeof(binary) - 1 ) / 4
-//   int i;
-//   char* tempNibble;
+// translate a binary string into hex
+char* binToHex(char* binary) {
+  char* hexadecimalValue = (char *)calloc(41, sizeof(char));
+  char* tempNibble = (char *)calloc(5, sizeof(char));
+  int numNibbles = strlen(binary) / 4;
+  int i;
 
-//   for(i = 0; i < numNibbles; ++i) {
-//     tempNibble = 
-//   }
-// }
+  // four bits at a time, assign the hexadecimal digits of our hex value
+  for(i = 0; i < numNibbles; ++i) {
+    strncpy(tempNibble, binary + (4 * i), 4);
+    hexadecimalValue[i] = fourBitToHex(tempNibble);
+  }
+
+  return hexadecimalValue;
+}
+
+// formatted print for humans
+void printBinaryString(char* binaryString) {
+  int i;
+  // TODO: implement character limit on lines 
+  for(i = 0; i < strlen(binaryString); ++i) {
+    if(i != 0 && i % 4 == 0 ) {
+      printf(" ");
+    }
+    printf("%c", binaryString[i]);
+  }
+} 
+
+// prepend zeroes to a binary string so that it has groups of 4 bits
+char* padBinaryString(char* binary) {
+  char* newBinary = (char *)calloc(160, sizeof(char));
+  int numDigits = strlen(binary);
+  int i;
+
+  // if we have groups of 4 bits throughout, no need to pad
+  if((numDigits % 4) != 0) {
+    for(i = 0; i < (4 - numDigits % 4); ++i) {
+      newBinary[i] = '0';
+    }
+  }
+
+  // join newBinary with binary to form the padded string
+  strcat(newBinary, binary);
+  return newBinary;
+}
 
 // converts four bits of a binary string to a hexadecimal character
 char fourBitToHex(char* fourBits) {
